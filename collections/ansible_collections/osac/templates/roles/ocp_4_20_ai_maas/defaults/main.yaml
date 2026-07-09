@@ -10,6 +10,8 @@ ocp_4_20_ai_maas_oidc_client_id: ""
 ocp_4_20_ai_maas_enable_observability: true
 ocp_4_20_ai_maas_enable_dashboard: true
 ocp_4_20_ai_maas_run_verify: true
+# Set to true to skip cluster creation and deploy MaaS on the existing mgmt cluster
+ocp_4_20_ai_maas_use_mgmt_cluster: false
 
 # Hardware profiles (empty = no profiles created; override per environment)
 ocp_4_20_ai_maas_hardware_profiles: []
