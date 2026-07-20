@@ -19,7 +19,38 @@
     ocp_4_20_ai_maas_external_models: "{{ template_parameters.external_models | default(ocp_4_20_ai_maas_external_models) }}"
   when: template_parameters is defined
 
-- name: Create cluster with RHOAI + MaaS post-install
+# When deploying on mgmt cluster: skip all cluster creation steps, use mgmt kubeconfig
+- name: Create cluster with RHOAI + MaaS post-install (mgmt cluster mode)
+  ansible.builtin.include_role:
+    name: osac.templates.ocp_4_17_small
+    tasks_from: install
+  vars:
+    ocp_release_image: "{{ ocp_4_20_ai_maas_ocp_release_image }}"
+    install_step_hosted_cluster_override:
+      name: osac.templates.ocp_4_17_small
+      tasks_from: noop.yaml
+    install_step_cluster_infra_override:
+      name: osac.templates.ocp_4_17_small
+      tasks_from: noop.yaml
+    install_step_external_access_override:
+      name: osac.templates.ocp_4_17_small
+      tasks_from: noop.yaml
+    install_step_retrieve_kubeconfig_override:
+      name: osac.templates.ocp_4_20_ai_maas
+      tasks_from: use_mgmt_kubeconfig.yaml
+    install_step_wait_for_nodes_override:
+      name: osac.templates.ocp_4_17_small
+      tasks_from: noop.yaml
+    install_step_wait_for_cluster_operators_override:
+      name: osac.templates.ocp_4_17_small
+      tasks_from: noop.yaml
+    install_step_post_install_hook_override:
+      name: osac.templates.ocp_4_20_ai_maas
+      tasks_from: post_install.yaml
+  when: ocp_4_20_ai_maas_use_mgmt_cluster | default(false) | bool
+
+# Normal mode: create a real inference cluster then deploy MaaS
+- name: Create cluster with RHOAI + MaaS post-install (normal mode)
   ansible.builtin.include_role:
     name: osac.templates.ocp_small
     tasks_from: install
@@ -28,3 +59,4 @@
     install_step_post_install_hook_override:
       name: osac.templates.ocp_4_20_ai_maas
       tasks_from: post_install.yaml
+  when: not (ocp_4_20_ai_maas_use_mgmt_cluster | default(false) | bool)
