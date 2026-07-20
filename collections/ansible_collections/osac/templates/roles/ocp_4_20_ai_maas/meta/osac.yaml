@@ -9,8 +9,6 @@ description: >
 template_type: cluster
 implementation_strategy: ocp_4_20_ai_maas
 default_node_request:
-  - resourceClass: g5
-    numberOfNodes: 2
   - resourceClass: ci-worker
     numberOfNodes: 2
 allowed_resource_classes: []
